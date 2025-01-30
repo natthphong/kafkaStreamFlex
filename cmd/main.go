@@ -2,20 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/api"
 	"gitlab.com/home-server7795544/home-server/iam/iam-backend/config"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/grpc_server"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/handler/auth"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/config/db"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/config/httputil"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/config/logz"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/config/sftp"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/api"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/cache"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/db"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/httputil"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/logz"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/s3"
 	"go.uber.org/zap"
 	"log"
 	"strconv"
@@ -42,9 +40,6 @@ func main() {
 	defer cancel()
 	logger := zap.L()
 	logger.Info("version " + strconv.FormatInt(versionDeploy, 10))
-	jsonCfg, err := json.Marshal(cfg.PermissionConfig)
-	_ = jsonCfg
-	logger.Debug("PermissionConfig : " + string(jsonCfg))
 	dbPool, err := db.Open(ctx, cfg.DBConfig)
 	if err != nil {
 		logger.Fatal("server connect to db", zap.Error(err))
@@ -59,44 +54,46 @@ func main() {
 		cfg.HTTP.MaxConnPerHost,
 	)
 	_ = httpClient
-	//redisClient, err := cache.Initialize(ctx, cfg.RedisConfig)
-	//if err != nil {
-	//	logger.Fatal("server connect to redis", zap.Error(err))
-	//}
-	//redisCMD := redisClient.UniversalClient()
-	//defer func() {
-	//	err = redisCMD.Close()
-	//	if err != nil {
-	//		logger.Fatal("closing redis connection error", zap.Error(err))
-	//	}
-	//}()
-	//logger.Info("Redis Connected")
 
-	configSftp := sftp.Config{
-		Username: "",
-		Password: "",
-		Server:   "host:port",
-		Timeout:  time.Second * 30,
-	}
-
-	client, err := sftp.New(configSftp)
+	redisClient, err := cache.Initialize(ctx, cfg.RedisConfig)
 	if err != nil {
-		logger.Fatal("server connect to sftp", zap.Error(err))
+		logger.Fatal("server connect to redis", zap.Error(err))
 	}
-	defer client.Close()
+	redisCMD := redisClient.UniversalClient()
+	defer func() {
+		err = redisCMD.Close()
+		if err != nil {
+			logger.Fatal("closing redis connection error", zap.Error(err))
+		}
+	}()
+	logger.Info("Redis Connected")
 
-	jwtSecret := "super-secret-key" // Replace with a secure secret
-	accessTokenDuration := 30 * time.Minute
-	refreshTokenDuration := 60 * time.Minute
+	//configSftp := sftp.Config{
+	//	Username: "",
+	//	Password: "",
+	//	Server:   "host:port",
+	//	Timeout:  time.Second * 30,
+	//}
+	//
+	//client, err := sftp.New(configSftp)
+	//if err != nil {
+	//	logger.Fatal("server connect to sftp", zap.Error(err))
+	//}
+	//defer client.Close()
+	s3Config := cfg.AwsS3Config
+	awsClient, err := s3.CreateSessionAws(&s3Config.DoSpaceEndpoint, s3Config.AccessKey, s3Config.SecretKey, s3Config.DoSpaceRegion)
+	if err != nil {
+		logger.Fatal("server connect to s3", zap.Error(err))
+	}
+	_ = awsClient
+	logger.Info("S3 Connected")
+
 	group := app.Group(fmt.Sprintf("/%s/api/v1", cfg.Server.Name))
 
-	auth.Register(group, dbPool, jwtSecret, accessTokenDuration, refreshTokenDuration)
 	group.Get("/health", func(c *fiber.Ctx) error {
 		return api.Ok(c, versionDeploy)
 	})
 	logger.Info(fmt.Sprintf("/%s/api/v1", cfg.Server.Name), zap.Any("port", cfg.Server.Port))
-	//logger.Debug("route", zap.Any("", app.GetRoutes(true)))
-	go grpc_server.StartGRPCServer(dbPool, jwtSecret, accessTokenDuration, refreshTokenDuration)
 	if err = app.Listen(fmt.Sprintf(":%v", cfg.Server.Port)); err != nil {
 		logger.Fatal(err.Error())
 	}

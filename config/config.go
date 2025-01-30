@@ -10,14 +10,15 @@ import (
 )
 
 type Config struct {
-	Env              string
-	EnableS3         bool
-	Server           Server
-	LogConfig        LogConfig
-	DBConfig         DBConfig
-	HTTP             HTTP
-	Kafka            Kafka
-	PermissionConfig map[string][]string
+	Env         string
+	EnableS3    bool
+	Server      Server
+	LogConfig   LogConfig
+	DBConfig    DBConfig
+	RedisConfig RedisConfig
+	AwsS3Config AwsS3Config
+	HTTP        HTTP
+	Kafka       Kafka
 }
 type Kafka struct {
 	Internal KafkaConfig
@@ -39,10 +40,6 @@ type KafkaConfig struct {
 	Password string
 	Strategy string
 }
-
-//type PermissionConfig struct {
-//	Permissions map[string][]string
-//}
 
 type RedisConfig struct {
 	Mode            string
