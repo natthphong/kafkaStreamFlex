@@ -1,3 +1,10 @@
+package main
+
+import (
+	"fmt"
+	"gitlab.com/home-server7795544/home-server/iam/iam-backend/sdk"
+)
+
 // This is the script that will be compiled into a .so file.
 // For example, to compile it:
 //   go build -buildmode=plugin -o example_script.so example_script.go

@@ -19,35 +19,35 @@ var mode string
 
 const CHASP = "CH:ASP"
 
-type redisClient struct {
+type RedisClient struct {
 	ClusterClient *redis.ClusterClient
 	Client        *redis.Client
 }
 
-func (r redisClient) CMD() redis.Cmdable {
+func (r RedisClient) CMD() redis.Cmdable {
 	if mode == "cluster" {
 		return r.ClusterClient
 	}
 	return r.Client
 }
 
-func (r *redisClient) Close() error {
+func (r *RedisClient) Close() error {
 	if mode == "cluster" {
 		return r.ClusterClient.Close()
 	}
 	return r.Client.Close()
 }
 
-func (r *redisClient) UniversalClient() redis.UniversalClient {
+func (r *RedisClient) UniversalClient() redis.UniversalClient {
 	if mode == "cluster" {
 		return r.ClusterClient
 	}
 	return r.Client
 }
 
-func Initialize(ctx context.Context, config config.RedisConfig) (*redisClient, error) {
+func Initialize(ctx context.Context, config config.RedisConfig) (*RedisClient, error) {
 
-	var client = &redisClient{}
+	var client = &RedisClient{}
 	mode = config.Mode
 
 	cliCh := make(chan string)

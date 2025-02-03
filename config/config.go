@@ -67,8 +67,9 @@ type AwsS3Config struct {
 }
 
 type Server struct {
-	Name string
-	Port string
+	Name     string
+	Port     string
+	TimeZone string
 }
 
 type LogConfig struct {
@@ -127,10 +128,14 @@ func InitConfig() (*Config, error) {
 
 }
 
-func InitTimeZone() {
-	ict, err := time.LoadLocation("Asia/Bangkok")
+func InitTimeZone(timeZones ...string) {
+	tzToUse := "Asia/Bangkok"
+	if len(timeZones) > 0 && timeZones[0] != "" {
+		tzToUse = timeZones[0]
+	}
+	loc, err := time.LoadLocation(tzToUse)
 	if err != nil {
 		panic(err)
 	}
-	time.Local = ict
+	time.Local = loc
 }
