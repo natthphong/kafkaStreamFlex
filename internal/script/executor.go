@@ -2,7 +2,7 @@ package script
 
 import (
 	"fmt"
-	"github.com/natthphong/kafkaStreamFlex/sdk"
+	sdk "github.com/natthphong/streamFlexSdk/client"
 	"log"
 	"os"
 	"os/exec"

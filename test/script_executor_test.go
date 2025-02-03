@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/natthphong/kafkaStreamFlex/internal/script"
-	"github.com/natthphong/kafkaStreamFlex/sdk"
+	"github.com/natthphong/streamFlexSdk/client"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,18 +15,20 @@ func TestExecuteBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal("Failed to get current directory:", err)
 	}
-	parentDir := filepath.Dir(cwd)
 
-	sourcePath := filepath.Join(parentDir, "sdk/test/example_script.go")
-	scriptPath := filepath.Join(parentDir, "sdk/test/example_script.so")
+	sourcePath := filepath.Join(cwd, "sdk/example_script.go")
+
+	fmt.Println("sourcePath:", sourcePath)
+	scriptPath := filepath.Join(cwd, "sdk/example_script.so")
 
 	err = script.BuildPlugin(sourcePath, scriptPath)
 	if err != nil {
+		t.Fatal("Failed to build plugin:", err)
 		return
 	}
 	payload := []byte(`{"hello":"world"}`)
-
-	client := sdk.NewStreamFlexClient(
+	fmt.Println("scriptPath:", scriptPath)
+	streamClient := client.NewStreamFlexClient(
 		context.Background(),
 		nil,
 		nil,
@@ -36,7 +38,7 @@ func TestExecuteBasic(t *testing.T) {
 		payload,
 	)
 
-	err = script.ExecuteScript(scriptPath, client)
+	err = script.ExecuteScript(scriptPath, streamClient)
 	if err != nil {
 		fmt.Println("Script execution failed:", err)
 	} else {

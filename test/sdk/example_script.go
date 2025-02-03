@@ -9,10 +9,10 @@ import (
 // For example, to compile it:
 //   go build -buildmode=plugin -o example_script.so example_script.go
 
-// Process is the function the executor will look up in the .so plugin.
-// It must match this exact signature if you plan to call it via reflection.
 func Process(client *client.StreamFlexClient) error {
 	// Example usage of the resources from the client
+
+	fmt.Println("Hello")
 	fmt.Println("Received payload:", string(client.Payload))
 
 	// Check DB connection (pseudocode)
