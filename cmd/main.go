@@ -25,19 +25,17 @@ func main() {
 	versionDeploy := currentTime.Unix()
 	ctx := context.Background()
 	app := initFiber()
-	config.InitTimeZone()
 	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel = context.WithCancel(ctx)
 	defer cancel()
 
 	cfg, err := config.InitConfig()
 	if err != nil {
-		log.Fatal(errors.New("Unable to initial config."))
+		log.Fatal(errors.New("unable to initial config"))
 	}
 	logz.Init(cfg.LogConfig.Level, cfg.Server.Name)
 	defer logz.Drop()
-
-	ctx, cancel = context.WithCancel(ctx)
-	defer cancel()
+	config.InitTimeZone(cfg.Server.TimeZone)
 	logger := zap.L()
 	logger.Info("version " + strconv.FormatInt(versionDeploy, 10))
 	dbPool, err := db.Open(ctx, cfg.DBConfig)
@@ -94,6 +92,7 @@ func main() {
 		return api.Ok(c, versionDeploy)
 	})
 	logger.Info(fmt.Sprintf("/%s/api/v1", cfg.Server.Name), zap.Any("port", cfg.Server.Port))
+
 	if err = app.Listen(fmt.Sprintf(":%v", cfg.Server.Port)); err != nil {
 		logger.Fatal(err.Error())
 	}
