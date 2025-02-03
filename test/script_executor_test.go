@@ -3,8 +3,8 @@ package test
 import (
 	"context"
 	"fmt"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/script"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/sdk"
+	"github.com/natthphong/kafkaStreamFlex/internal/script"
+	"github.com/natthphong/kafkaStreamFlex/sdk"
 	"os"
 	"path/filepath"
 	"testing"

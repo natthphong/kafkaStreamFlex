@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/config"
+	"github.com/natthphong/kafkaStreamFlex/config"
 	"log"
 	"time"
 )

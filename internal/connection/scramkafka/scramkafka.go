@@ -6,9 +6,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"github.com/Shopify/sarama"
+	"github.com/natthphong/kafkaStreamFlex/config"
 	"github.com/pkg/errors"
 	"github.com/xdg-go/scram"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/config"
 
 	"go.uber.org/zap"
 	"hash"

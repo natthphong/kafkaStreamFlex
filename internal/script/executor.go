@@ -2,7 +2,7 @@ package script
 
 import (
 	"fmt"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/sdk"
+	"github.com/natthphong/kafkaStreamFlex/sdk"
 	"log"
 	"os"
 	"os/exec"

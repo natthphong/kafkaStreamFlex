@@ -3,11 +3,11 @@ package sdk
 import (
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/cache"
+	"github.com/natthphong/kafkaStreamFlex/internal/connection/cache"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/internal/connection/kafka"
+	"github.com/natthphong/kafkaStreamFlex/internal/connection/kafka"
 )
 
 type StreamFlexClient struct {

@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 	"github.com/go-redis/redis/v9"
-	"gitlab.com/home-server7795544/home-server/iam/iam-backend/config"
+	"github.com/natthphong/kafkaStreamFlex/config"
 	"time"
 
 	"github.com/pkg/errors"

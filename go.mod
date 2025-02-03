@@ -1,4 +1,4 @@
-module gitlab.com/home-server7795544/home-server/iam/iam-backend
+module github.com/natthphong/kafkaStreamFlex
 
 go 1.22.7
 
