@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/natthphong/kafkaStreamFlex/sdk"
+	"github.com/natthphong/streamFlexSdk/client"
 )
 
 // This is the script that will be compiled into a .so file.
@@ -11,7 +11,7 @@ import (
 
 // Process is the function the executor will look up in the .so plugin.
 // It must match this exact signature if you plan to call it via reflection.
-func Process(client *sdk.StreamFlexClient) error {
+func Process(client *client.StreamFlexClient) error {
 	// Example usage of the resources from the client
 	fmt.Println("Received payload:", string(client.Payload))
 
