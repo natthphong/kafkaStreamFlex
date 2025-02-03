@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/natthphong/kafkaStreamFlex/test/sdk/utils"
 	"github.com/natthphong/streamFlexSdk/client"
 )
 
@@ -10,6 +11,7 @@ import (
 //   go build -buildmode=plugin -o example_script.so example_script.go
 
 func Process(client *client.StreamFlexClient) error {
+	utils.Hello()
 	// Example usage of the resources from the client
 	fmt.Println("Hello")
 	fmt.Println("Received payload:", string(client.Payload))

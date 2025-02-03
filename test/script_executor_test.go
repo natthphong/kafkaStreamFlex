@@ -16,7 +16,7 @@ func TestExecuteBasic(t *testing.T) {
 		t.Fatal("Failed to get current directory:", err)
 	}
 
-	sourcePath := filepath.Join(cwd, "sdk/example_script.go")
+	sourcePath := filepath.Join(cwd, "sdk/")
 
 	fmt.Println("sourcePath:", sourcePath)
 	scriptPath := filepath.Join(cwd, "sdk/example_script.so")
@@ -30,6 +30,7 @@ func TestExecuteBasic(t *testing.T) {
 	fmt.Println("scriptPath:", scriptPath)
 	streamClient := client.NewStreamFlexClient(
 		context.Background(),
+		nil,
 		nil,
 		nil,
 		nil,

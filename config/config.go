@@ -64,6 +64,7 @@ type AwsS3Config struct {
 	AccessKey       string
 	SecretKey       string
 	BucketName      string
+	Token           string
 }
 
 type Server struct {

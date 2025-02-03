@@ -17,13 +17,19 @@ import (
 	"time"
 )
 
-func CreateSessionAws(url *string, accessKeyID string, secretAccessKey string, region string) (*session.Session, error) {
+func CreateSessionAws(url *string, accessKeyID, secretAccessKey, token, region string) (*session.Session, error) {
+	config := &aws.Config{
+		Endpoint:    url,
+		Region:      aws.String(region),
+		Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
+	}
+	if accessKeyID == "" || secretAccessKey == "" {
+		config.Credentials = nil
+	}
+
 	sess, err := session.NewSession(
-		&aws.Config{
-			Endpoint:    url,
-			Region:      aws.String(region),
-			Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
-		})
+		config,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -79,7 +79,7 @@ func main() {
 	//}
 	//defer client.Close()
 	s3Config := cfg.AwsS3Config
-	awsClient, err := s3.CreateSessionAws(&s3Config.DoSpaceEndpoint, s3Config.AccessKey, s3Config.SecretKey, s3Config.DoSpaceRegion)
+	awsClient, err := s3.CreateSessionAws(&s3Config.DoSpaceEndpoint, s3Config.AccessKey, s3Config.SecretKey, s3Config.Token, s3Config.DoSpaceRegion)
 	if err != nil {
 		logger.Fatal("server connect to s3", zap.Error(err))
 	}
