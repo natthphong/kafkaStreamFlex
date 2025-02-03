@@ -11,10 +11,8 @@ import (
 
 func Process(client *client.StreamFlexClient) error {
 	// Example usage of the resources from the client
-
 	fmt.Println("Hello")
 	fmt.Println("Received payload:", string(client.Payload))
-
 	// Check DB connection (pseudocode)
 	if client.DB != nil {
 		// Use client.DB to query the database
