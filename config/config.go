@@ -10,15 +10,16 @@ import (
 )
 
 type Config struct {
-	Env         string
-	EnableS3    bool
-	Server      Server
-	LogConfig   LogConfig
-	DBConfig    DBConfig
-	RedisConfig RedisConfig
-	AwsS3Config AwsS3Config
-	HTTP        HTTP
-	Kafka       Kafka
+	Env          string
+	EnableS3     bool
+	Server       Server
+	LogConfig    LogConfig
+	DBConfig     DBConfig
+	RedisConfig  RedisConfig
+	AwsS3Config  AwsS3Config
+	HTTP         HTTP
+	Kafka        Kafka
+	ScriptConfig ScriptConfig
 }
 type Kafka struct {
 	Internal KafkaConfig
@@ -65,6 +66,10 @@ type AwsS3Config struct {
 	SecretKey       string
 	BucketName      string
 	Token           string
+}
+
+type ScriptConfig struct {
+	BasePath string
 }
 
 type Server struct {

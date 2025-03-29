@@ -2,7 +2,6 @@ package s3
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -10,18 +9,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"go.uber.org/zap"
-	"image"
-	"image/jpeg"
 	"os"
-	"strings"
 	"time"
 )
 
 func CreateSessionAws(url *string, accessKeyID, secretAccessKey, token, region string) (*session.Session, error) {
 	config := &aws.Config{
-		Endpoint:    url,
-		Region:      aws.String(region),
-		Credentials: credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
+		Endpoint:         url,
+		Region:           aws.String(region),
+		S3ForcePathStyle: aws.Bool(true),
+		Credentials:      credentials.NewStaticCredentials(accessKeyID, secretAccessKey, ""),
 	}
 	if accessKeyID == "" || secretAccessKey == "" {
 		config.Credentials = nil
@@ -45,8 +42,7 @@ func NewDownloadFileFromS3Func(sess *session.Session, bucket string) DownloadFil
 
 		logger.Info(fmt.Sprintf("Download file %s from S3", filename))
 
-		filenameGen := fmt.Sprintf("%d_%s", time.Now().Unix(), strings.ReplaceAll(filename, "/", "_"))
-		file, err := os.Create(filenameGen)
+		file, err := os.Create(filename)
 		if err != nil {
 			return nil, err
 		}
@@ -62,44 +58,25 @@ func NewDownloadFileFromS3Func(sess *session.Session, bucket string) DownloadFil
 			logger.Error(fmt.Sprintf("download err: %s", err.Error()))
 			return nil, err
 		}
-		logger.Info(fmt.Sprintf("File: %s, Size: %d", filenameGen, numBytes))
+		logger.Info(fmt.Sprintf("File: %s, Size: %d", filename, numBytes))
 
-		return &filenameGen, nil
+		return &filename, nil
 
 	}
 }
 
-type S3UploadBase64Func func(logger *zap.Logger, base64File, objectKey string) error
+type S3UploadFunc func(logger *zap.Logger, objectKey string, body []byte) error
 
-func S3UploadBase64(sess *session.Session, bucket string) S3UploadBase64Func {
-	return func(logger *zap.Logger, base64Data, objectKey string) error {
-
-		contentType := base64Data[strings.IndexByte(base64Data, ':')+1 : strings.IndexByte(base64Data, ',')]
-		b64data := base64Data[strings.IndexByte(base64Data, ',')+1:]
-
-		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(b64data))
-		image, _, err := image.Decode(reader)
-		if err != nil {
-			return err
-		}
-		image.Bounds()
-
-		buf := new(bytes.Buffer)
-		err = jpeg.Encode(buf, image, nil)
-		if err != nil {
-			return err
-		}
-		body := buf.Bytes()
-
-		_, err = s3.New(sess).PutObject(&s3.PutObjectInput{
-			Bucket:          aws.String(bucket),
-			Key:             aws.String(objectKey),
-			Body:            bytes.NewReader(body),
-			ContentEncoding: aws.String("base64"),
-			ContentType:     aws.String(contentType),
+func NewS3Upload(sess *session.Session, bucket string) S3UploadFunc {
+	return func(logger *zap.Logger, objectKey string, body []byte) error {
+		_, err := s3.New(sess).PutObject(&s3.PutObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(objectKey),
+			Body:   bytes.NewReader(body),
 		})
 
 		if err != nil {
+			logger.Error(fmt.Sprintf("upload err: %s", err.Error()))
 			return err
 		}
 		return nil

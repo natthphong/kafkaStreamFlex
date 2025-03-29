@@ -35,6 +35,7 @@ func BuildPlugin(sourceFilePath, outputSoPath string) error {
 func ExecuteScript(scriptPath string, client *sdk.StreamFlexClient) error {
 	plg, err := plugin.Open(scriptPath)
 	if err != nil {
+		// TODO not found go load from s3 server
 		return fmt.Errorf("failed to load plugin %s: %w", scriptPath, err)
 	}
 

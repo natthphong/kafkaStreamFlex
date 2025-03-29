@@ -22,7 +22,7 @@ func (r *scriptRepositoryImpl) Save(ctx context.Context, logger *zap.Logger, scr
 		ON CONFLICT (id) DO UPDATE SET
 			script_key = EXCLUDED.script_key,
 			script_name = EXCLUDED.script_name,
-			version = EXCLUDED.version,
+			version = tbl_script.version + 1,
 			is_deleted = EXCLUDED.is_deleted,
 			created_at = EXCLUDED.created_at,
 			create_by = EXCLUDED.create_by;
@@ -32,7 +32,7 @@ func (r *scriptRepositoryImpl) Save(ctx context.Context, logger *zap.Logger, scr
 		logger.Error("Error saving script", zap.Error(err))
 		return err
 	}
-	logger.Info("Script saved successfully", zap.Int("id", script.ID))
+	logger.Info("Script saved successfully", zap.String("id", script.ID))
 	return nil
 }
 
@@ -46,7 +46,7 @@ func (r *scriptRepositoryImpl) FindById(ctx context.Context, logger *zap.Logger,
 		logger.Error("Error fetching script", zap.Error(err))
 		return nil, err
 	}
-	logger.Info("Script retrieved successfully", zap.Int("id", script.ID))
+	logger.Info("Script retrieved successfully", zap.String("id", script.ID))
 	return &script, nil
 }
 

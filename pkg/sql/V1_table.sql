@@ -16,7 +16,7 @@ create table public.tbl_topic
 
 create table public.tbl_script
 (
-    id serial primary key ,
+    id varchar(255) primary key ,
     script_key varchar(255),
     script_name varchar(255),
     version int default 0,

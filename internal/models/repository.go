@@ -15,7 +15,7 @@ type Topic struct {
 }
 
 type Script struct {
-	ID         int       `db:"id"`
+	ID         string    `db:"id"`
 	ScriptKey  string    `db:"script_key"`
 	ScriptName string    `db:"script_name"`
 	Version    int       `db:"version"`

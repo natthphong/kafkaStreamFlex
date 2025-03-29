@@ -91,6 +91,7 @@ func main() {
 	group.Get("/health", func(c *fiber.Ctx) error {
 		return api.Ok(c, versionDeploy)
 	})
+	api.RegisterRoutes(group, dbPool, "", *cfg, awsClient)
 	logger.Info(fmt.Sprintf("/%s/api/v1", cfg.Server.Name), zap.Any("port", cfg.Server.Port))
 
 	if err = app.Listen(fmt.Sprintf(":%v", cfg.Server.Port)); err != nil {
