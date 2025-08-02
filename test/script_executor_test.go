@@ -22,11 +22,11 @@ func TestExecuteBasic(t *testing.T) {
 	fmt.Println("sourcePath:", sourcePath)
 	scriptPath := filepath.Join(cwd, "sdk/example_script.so")
 
-	//err = script.BuildPlugin(sourcePath, scriptPath)
-	//if err != nil {
-	//	t.Fatal("Failed to build plugin:", err)
-	//	return
-	//}
+	err = script.BuildPlugin(sourcePath, scriptPath)
+	if err != nil {
+		t.Fatal("Failed to build plugin:", err)
+		return
+	}
 	payload := []byte(`{"hello":"world"}`)
 	fmt.Println("scriptPath:", scriptPath)
 	streamClient := client.NewStreamFlexClient(

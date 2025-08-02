@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
@@ -15,9 +19,6 @@ import (
 	"github.com/natthphong/kafkaStreamFlex/internal/connection/logz"
 	"github.com/natthphong/kafkaStreamFlex/internal/connection/s3"
 	"go.uber.org/zap"
-	"log"
-	"strconv"
-	"time"
 )
 
 func main() {

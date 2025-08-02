@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"plugin"
-	"runtime"
 
 	sdk "github.com/natthphong/streamFlexSdk/client"
 )
@@ -17,18 +16,16 @@ func BuildPlugin(src, dst string) error {
 		return fmt.Errorf("create output dir: %w", err)
 	}
 
-	goBin := filepath.Join(runtime.GOROOT(), "bin", "go") // exact toolchain
 	cmd := exec.Command(
-		goBin, "build",
+		"go", "build",
 		"-buildmode=plugin",
 		"-o", dst,
-		src, // directory or *.go containing package main
+		src,
 	)
 
-	// guarantee cgo + same toolchain
 	cmd.Env = append(os.Environ(),
 		"CGO_ENABLED=1",
-		"GOTOOLCHAIN=local", // disable automatic version switching
+		"GOTOOLCHAIN=local",
 	)
 
 	if out, err := cmd.CombinedOutput(); err != nil {
