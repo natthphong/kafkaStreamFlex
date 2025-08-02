@@ -2,36 +2,40 @@ package script
 
 import (
 	"fmt"
-	sdk "github.com/natthphong/streamFlexSdk/client"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"plugin"
+	"runtime"
+
+	sdk "github.com/natthphong/streamFlexSdk/client"
 )
 
-func BuildPlugin(sourceFilePath, outputSoPath string) error {
-	outDir := filepath.Dir(outputSoPath)
-	if err := os.MkdirAll(outDir, 0755); err != nil {
-		return fmt.Errorf("failed to create output directory: %w", err)
+func BuildPlugin(src, dst string) error {
+	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
+		return fmt.Errorf("create output dir: %w", err)
 	}
 
+	goBin := filepath.Join(runtime.GOROOT(), "bin", "go") // exact toolchain
 	cmd := exec.Command(
-		"go",
-		"build",
+		goBin, "build",
 		"-buildmode=plugin",
-		"-o", outputSoPath,
-		sourceFilePath,
+		"-o", dst,
+		src, // directory or *.go containing package main
 	)
 
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("build plugin failed: %w\nOutput:\n%s", err, string(output))
-	}
+	// guarantee cgo + same toolchain
+	cmd.Env = append(os.Environ(),
+		"CGO_ENABLED=1",
+		"GOTOOLCHAIN=local", // disable automatic version switching
+	)
 
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("build plugin: %w\n%s", err, out)
+	}
 	return nil
 }
-
 func ExecuteScript(scriptPath string, client *sdk.StreamFlexClient) error {
 	plg, err := plugin.Open(scriptPath)
 	if err != nil {
